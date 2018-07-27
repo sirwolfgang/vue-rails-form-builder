@@ -27,7 +27,7 @@ Installation
 Add the following line to `Gemfile`:
 
 ```ruby
-gem "vue-rails-form-builder"
+gem 'vue-rails-form-builder'
 ```
 
 Run `bundle install` on the terminal.
@@ -92,10 +92,17 @@ If you use Rails 5.1 or above, you can also use `vue_form_with`:
 <% end %>
 ```
 
-By default, this gem render v-model tag with object and attributes snake-cased just like your model table columns. If you want to render the v-model tag with object and attribute camelized, you can pass the option `camelize` to the vue_form_for or vue_form_with tag:
+By default, this gem render v-model tag with object and attributes camelized per javascript/vuejs standards. If you want to render the v-model tag with object and attribute snake_case, per ruby/rails' standards, you either set the configuration in the initializer or pass the option `camelize` to the vue_form_for or vue_form_with tag:
+
+```ruby
+# config/initializers/vue.rb
+TLO.configure do |config|
+  config.camelize = false
+end
+```
 
 ```erb
-<%= vue_form_with(model: GenericModel.new, camelize: true) do |f| %>
+<%= vue_form_with(model: GenericModel.new, camelize: false) do |f| %>
   <%= f.text_field :generic_field %>
   <%= f.submit "Create" %>
 <% end %>
@@ -104,7 +111,7 @@ By default, this gem render v-model tag with object and attributes snake-cased j
 This will render:
 
 ```html
- <input type="text" name="generic_model[generic_field]" id="generic_model_generic_field" v-model="genericModel.genericField"> 
+ <input type="text" name="generic_model[generic_field]" id="generic_model_generic_field" v-model="generic_model.generic_field">
 ```
 
 Demo App

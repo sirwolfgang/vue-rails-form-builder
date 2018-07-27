@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
-module TLO
+module VueRailsFormBuilder
   # Configuration
-  class VueRailsFormBuilder < OpenStruct
-    DEFAULTS = {}.freeze
+  class Configuration < OpenStruct
+    DEFAULTS = {
+      camelize: true
+    }.freeze
 
     # Creates a new Configuration from the passed in parameters
     # @param params [Hash] configuration options
