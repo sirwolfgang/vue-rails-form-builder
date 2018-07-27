@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
 module VueRailsFormBuilder
-  module VueOptionsResolver
+  module OptionsResolver
     private def resolve_vue_options(options)
       if options[:bind].is_a?(Hash)
-        h = options.delete(:bind)
-        h.each do |key, value|
+        bind_options = options.delete(:bind)
+        bind_options.each do |key, value|
           options[:"v-bind:#{key}"] = value if value.is_a?(String)
         end
       end
 
       if options[:on].is_a?(Hash)
-        h = options.delete(:on)
-        h.each do |key, value|
+        on_options = options.delete(:on)
+        on_options.each do |key, value|
           options[:"v-on:#{key}"] = value if value.is_a?(String)
         end
       end

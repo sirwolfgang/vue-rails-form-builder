@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative './vue_options_resolver'
+require_relative 'options_resolver'
 
 module VueRailsFormBuilder
   class FormBuilder < ActionView::Helpers::FormBuilder
-    include VueRailsFormBuilder::VueOptionsResolver
+    include VueRailsFormBuilder::OptionsResolver
 
     (field_helpers - %i[label check_box radio_button fields_for file_field])
       .each do |selector|

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative './vue_options_resolver'
+require_relative 'options_resolver'
 
 module VueRailsFormBuilder
   module TagHelper
-    include VueRailsFormBuilder::VueOptionsResolver
+    include VueRailsFormBuilder::OptionsResolver
 
     def vue_tag(name, options = nil, open = false, escape = true)
       resolve_vue_options(options) if options
