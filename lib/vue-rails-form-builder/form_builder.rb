@@ -36,7 +36,7 @@ module VueRailsFormBuilder
 
     def select(method, choices = nil, options = {}, html_options = {}, &block)
       resolve_vue_options(html_options)
-      add_v_model_attribute(method, html_options)
+      add_v_model_attribute(method, options)
       super(method, choices, options, html_options, &block)
     end
 
