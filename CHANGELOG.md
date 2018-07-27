@@ -1,5 +1,8 @@
 # CHANGELOG - vue-rails-form-builder
 
+## 1.0.0
+* Add camelize option to binding, see configuration for backwards compatibility
+
 ## 0.8.2 (2018-02-15)
 
 * Do override the `file_filed` helper to resolve vue.js options.
