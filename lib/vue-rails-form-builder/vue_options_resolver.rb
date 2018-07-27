@@ -40,7 +40,11 @@ module VueRailsFormBuilder
     private def add_v_model_attribute(method, options)
       path = @object_name.tr('[', '.').delete(']').split('.')
       path[0] = @options[:vue_scope] if @options[:vue_scope]
-      options[:"v-model"] ||= (path + [method]).join('.')
+      options[:"v-model"] ||= if @options[:camelize]
+                                (path + [method]).join('.').camelize(:lower)
+                              else
+                                (path + [method]).join('.')
+                              end
       options[:"v-model"].gsub!(/\.(\d+)/, '[\1]')
     end
   end
