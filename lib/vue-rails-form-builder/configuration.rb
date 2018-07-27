@@ -4,7 +4,7 @@ module VueRailsFormBuilder
   # Configuration
   class Configuration < OpenStruct
     DEFAULTS = {
-      camelize: true
+      camelize: false
     }.freeze
 
     # Creates a new Configuration from the passed in parameters

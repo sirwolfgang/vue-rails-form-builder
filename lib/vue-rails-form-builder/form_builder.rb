@@ -6,12 +6,19 @@ module VueRailsFormBuilder
   class FormBuilder < ActionView::Helpers::FormBuilder
     include VueRailsFormBuilder::OptionsResolver
 
+    def initialize(object_name, object, template, options)
+      @camelize = options[:camelize]
+      @camelize = VueRailsFormBuilder.configuration.camelize if @camelize.nil?
+
+      super(object_name, object, template, options)
+    end
+
     (field_helpers - %i[label check_box radio_button fields_for file_field])
       .each do |selector|
       class_eval <<-RUBY_EVAL, __FILE__, __LINE__ + 1
         def #{selector}(method, options = {})
           resolve_vue_options(options)
-          add_v_model_attribute(method, options)
+          add_v_model_attribute(method, options, @camelize)
           super(method, options)
         end
       RUBY_EVAL
@@ -24,19 +31,19 @@ module VueRailsFormBuilder
 
     def check_box(method, options = {}, checked_value = '1', unchecked_value = '0')
       resolve_vue_options(options)
-      add_v_model_attribute(method, options)
+      add_v_model_attribute(method, options, @camelize)
       super(method, options, checked_value, unchecked_value)
     end
 
     def radio_button(method, tag_value, options = {})
       resolve_vue_options(options)
-      add_v_model_attribute(method, options)
+      add_v_model_attribute(method, options, @camelize)
       super(method, tag_value, options)
     end
 
     def select(method, choices = nil, options = {}, html_options = {}, &block)
       resolve_vue_options(html_options)
-      add_v_model_attribute(method, options)
+      add_v_model_attribute(method, options, @camelize)
       super(method, choices, options, html_options, &block)
     end
 

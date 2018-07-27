@@ -37,10 +37,10 @@ module VueRailsFormBuilder
       end
     end
 
-    private def add_v_model_attribute(method, options)
+    private def add_v_model_attribute(method, options, camelize)
       path = @object_name.tr('[', '.').delete(']').split('.')
       path[0] = @options[:vue_scope] if @options[:vue_scope]
-      options[:"v-model"] ||= if @options[:camelize]
+      options[:"v-model"] ||= if camelize
                                 (path + [method]).join('.').camelize(:lower)
                               else
                                 (path + [method]).join('.')
