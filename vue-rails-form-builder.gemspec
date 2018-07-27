@@ -1,21 +1,31 @@
 # frozen_string_literal: true
 
-version = File.read(File.expand_path('VERSION', __dir__)).strip
+lib = File.expand_path('lib', __dir__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'vue-rails-form-builder/version'
 
-Gem::Specification.new do |s|
-  s.name        = 'vue-rails-form-builder'
-  s.version     = version
-  s.authors     = ['Tsutomu KURODA']
-  s.email       = 't-kuroda@oiax.jp'
-  s.homepage    = 'https://github.com/kuroda/vue-rails-form-builder'
-  s.description = 'This gem provides four view helpers for Rails app: ' \
-                  'vue_form_with, vue_form_for, vue_tag and vue_content_tag.'
-  s.summary     = 'A custom Rails form builder for Vue.js'
-  s.license     = 'MIT'
+Gem::Specification.new do |spec|
+  spec.name        = 'vue-rails-form-builder'
+  spec.version     = VueRailsFormBuilder::VERSION
+  spec.authors     = ['Tsutomu KURODA']
+  spec.email       = ['t-kuroda@oiax.jp']
 
-  s.required_ruby_version = '>= 2.2.2'
-  s.add_dependency 'actionview', '>= 4.2', '< 6'
-  s.add_dependency 'railties', '>= 4.2', '< 6'
+  spec.homepage    = 'https://github.com/kuroda/vue-rails-form-builder'
+  spec.summary     = 'A custom Rails form builder for Vue.js'
+  spec.description = 'This gem provides four view helpers for Rails app: ' \
+                     'vue_form_with, vue_form_for, vue_tag and vue_content_tag.'
+  spec.license     = 'MIT'
 
-  s.files = %w[CHANGELOG.md README.md MIT-LICENSE] + Dir.glob('lib/**/*')
+  spec.files = `git ls-files -z`.split("\x0").reject do |f|
+    f.match(%r{^(test|spec|features)/})
+  end
+
+  spec.bindir        = 'exe'
+  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.require_paths = ['lib']
+
+  spec.required_ruby_version = '>= 2.2.2'
+
+  spec.add_dependency 'actionview', '>= 4.2', '< 6'
+  spec.add_dependency 'railties', '>= 4.2', '< 6'
 end
