@@ -1,10 +1,12 @@
-require_relative "./vue_options_resolver"
+# frozen_string_literal: true
+
+require_relative './vue_options_resolver'
 
 module VueRailsFormBuilder
   class FormBuilder < ActionView::Helpers::FormBuilder
     include VueRailsFormBuilder::VueOptionsResolver
 
-    (field_helpers - [:label, :check_box, :radio_button, :fields_for, :file_field])
+    (field_helpers - %i[label check_box radio_button fields_for file_field])
       .each do |selector|
       class_eval <<-RUBY_EVAL, __FILE__, __LINE__ + 1
         def #{selector}(method, options = {})
@@ -20,7 +22,7 @@ module VueRailsFormBuilder
       super(method, text, options, &block)
     end
 
-    def check_box(method, options = {}, checked_value = "1", unchecked_value = "0")
+    def check_box(method, options = {}, checked_value = '1', unchecked_value = '0')
       resolve_vue_options(options)
       add_v_model_attribute(method, options)
       super(method, options, checked_value, unchecked_value)
@@ -54,11 +56,9 @@ module VueRailsFormBuilder
     end
 
     def vue_prefix
-      path = @object_name.gsub(/\[/, ".").gsub(/\]/, "").split(".")
-      if @options[:vue_scope]
-        path[0] = @options[:vue_scope]
-      end
-      path.join(".").gsub(/\.(\d+)/, '[\1]')
+      path = @object_name.tr('[', '.').delete(']').split('.')
+      path[0] = @options[:vue_scope] if @options[:vue_scope]
+      path.join('.').gsub(/\.(\d+)/, '[\1]')
     end
   end
 end

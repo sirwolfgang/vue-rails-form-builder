@@ -1,4 +1,6 @@
-require_relative "./vue_options_resolver"
+# frozen_string_literal: true
+
+require_relative './vue_options_resolver'
 
 module VueRailsFormBuilder
   module TagHelper
@@ -10,7 +12,7 @@ module VueRailsFormBuilder
     end
 
     def vue_content_tag(name, content_or_options_with_block = nil, options = nil,
-      escape = true, &block)
+                        escape = true, &block)
 
       if block_given?
         if content_or_options_with_block.is_a?(Hash)

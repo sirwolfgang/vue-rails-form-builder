@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module VueRailsFormBuilder
   module FormHelper
     def vue_form_with(**options)
       unless respond_to?(:form_with)
-        raise "Your Rails does not implement form_with helper."
+        raise 'Your Rails does not implement form_with helper.'
       end
 
       options[:builder] ||= VueRailsFormBuilder::FormBuilder
