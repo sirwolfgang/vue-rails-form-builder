@@ -10,6 +10,8 @@ module VueRailsFormBuilder
       @camelize = options[:camelize]
       @camelize = VueRailsFormBuilder.configuration.camelize if @camelize.nil?
 
+      options[:html][:data] = camelize_data(options[:html][:data]) if @camelize
+
       super(object_name, object, template, options)
     end
 
@@ -66,6 +68,18 @@ module VueRailsFormBuilder
       path = @object_name.tr('[', '.').delete(']').split('.')
       path[0] = @options[:vue_scope] if @options[:vue_scope]
       path.join('.').gsub(/\.(\d+)/, '[\1]')
+    end
+
+    def camelize_data(data)
+      data.update(data) do |_, datum|
+        datum = datum.as_json
+
+        next unless datum.is_a?(Hash)
+
+        datum.deep_transform_keys do |key|
+          key.camelize(:lower)
+        end
+      end
     end
   end
 end
