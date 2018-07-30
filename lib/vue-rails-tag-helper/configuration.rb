@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-module VueRailsFormBuilder
-  # Configuration
+module VueRailsTagHelper
   class Configuration < OpenStruct
     DEFAULTS = {
       camelize: false

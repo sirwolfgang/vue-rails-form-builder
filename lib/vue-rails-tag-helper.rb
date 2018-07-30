@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'vue-rails-form-builder/configuration'
-require 'vue-rails-form-builder/form_builder'
-require 'vue-rails-form-builder/railtie'
+require 'vue-rails-tag-helper/configuration'
+require 'vue-rails-tag-helper/form_builder'
+require 'vue-rails-tag-helper/railtie'
 
-module VueRailsFormBuilder
+module VueRailsTagHelper
   def self.configuration
     @configuration ||= Configuration.new.freeze
   end

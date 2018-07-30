@@ -1,40 +1,41 @@
-vue-rails-form-builder
-======================
+# Vue Rails Tag Helper
+A custom Rails tag helper for Vue.js
 
-[![Gem Version](https://badge.fury.io/rb/vue-rails-form-builder.svg)](https://badge.fury.io/rb/vue-rails-form-builder)
-
-A custom Rails form builder for Vue.js
-
-Synopsis
---------
-
+## Synopsis
 ```erb
-<%= vue_form_for User.new do |f| %>
+<%= vue_form_for @user, v: { data: { user: @user } } do |f| %>
   <%= f.text_field :name %>
+  <%= tag 'markdown-editor', v: { model: form.vue_model(:description) } %>
 <% end %>
 ```
 
 ```html
-<form ...>
+<form data-user="{...}" ...>
   ...
   <input v-model="user.name" type="text" name="user[name]" ... />
+  <markdown-editor v-model="user.description" />
 </form>
 ```
 
-Installation
-------------
+```javascript
+new Vue({
+  el: element,
+  data: {
+    user: JSON.parse(element.dataset.user)
+  }
+})
+```
 
+## Installation
 Add the following line to `Gemfile`:
 
 ```ruby
-gem 'vue-rails-form-builder'
+gem 'vue-rails-tag-helper'
 ```
 
 Run `bundle install` on the terminal.
 
-Usage
------
-
+## Usage
 ```erb
 <%= vue_form_for User.new do |f| %>
   <%= f.text_field :name %>
@@ -53,12 +54,9 @@ The above ERB template will be rendered into the following HTML fragment:
 </form>
 ```
 
-Note that the third `<input>` element has a `v-model` attriubte, which can be
-interpreted by Vue.js as the _directive_ to create two-way data bindings between
-form fields and component's data.
+Note that the third `<input>` element has a `v-model` attriubte, which can be interpreted by Vue.js as the _directive_ to create two-way data bindings between form fields and component's data.
 
-If you are using the [Webpacker](https://github.com/rails/webpacker),
-create `app/javascript/packs/new_user_form.js` with following code:
+If you are using the [Webpacker](https://github.com/rails/webpacker), create `app/javascript/packs/new_user_form.js` with following code:
 
 ```javascript
 import Vue from 'vue/dist/vue.esm'
@@ -92,17 +90,18 @@ If you use Rails 5.1 or above, you can also use `vue_form_with`:
 <% end %>
 ```
 
-By default, this gem render v-model tag with object and attributes camelized per javascript/vuejs standards. If you want to render the v-model tag with object and attribute snake_case, per ruby/rails' standards, you either set the configuration in the initializer or pass the option `camelize` to the vue_form_for or vue_form_with tag:
+By default, this gem render v-model tag with object and attributes snake_case per rails. If you want to render the v-model tag with object and attributes with camelcase you simply set the configuration in the initializer to the vue_form_for or vue_form_with tag:
 
 ```ruby
 # config/initializers/vue.rb
-TLO.configure do |config|
+
+VueRailsTagHelper.configure do |config|
   config.camelize = false
 end
 ```
 
 ```erb
-<%= vue_form_with(model: GenericModel.new, camelize: false) do |f| %>
+<%= vue_form_with(model: GenericModel.new) do |f| %>
   <%= f.text_field :generic_field %>
   <%= f.submit "Create" %>
 <% end %>
@@ -111,185 +110,27 @@ end
 This will render:
 
 ```html
- <input type="text" name="generic_model[generic_field]" id="generic_model_generic_field" v-model="generic_model.generic_field">
+ <input type="text" name="generic_model[generic_field]" id="generic_model_generic_field" v-model="genericModel.genericField">
 ```
 
-Demo App
---------
+## Options
 
-Visit [vue-rails-form-builder-demo](https://github.com/kuroda/vue-rails-form-builder-demo)
-for a working Rails demo application using the `vue-rails-form-builder`.
-
-Options
--------
-
-To `vue_form_for` and `vue_form_with` methods you can provide the same options
-as `form_for` and `form_with`.
+To `vue_form_for` and `vue_form_with` methods you can provide the same options as `form_for` and `form_with`.
 
 There is a special option:
 
-* `:vue_scope` - The prefix used to the input field names within the Vue
-  component.
+* `:vue_scope` - The prefix used to the input field names within the Vue component.
 
-Tag Helper
-----------
-
-This gem provides two additional helper methods: `vue_tag` and `vue_content_tag`.
-
-Basically, they behave like `tag` and `content_tag` helpers of Action Views.
-But, they interpret the *HTML options* in a different way as explained below.
-
-### The `:bind` option
-
-If the *HTML options* have a `:bind` key and its value is a hash,
-they get transformed into the Vue.js `v-bind` directives.
-
-In the example below, these two lines have the same result:
-
+## Tag Helper
+This adds the ability for any tag helpers to accept params with a `v` prefix. Which will then be used to prepend attributes much like `data`. In addition to allowing you to set different vue options, it also will apply your camelize setting to both `v-model` and `v-data` options. However, due to the way vue updates objects, `v-data` options are translated and merged with your `data` options.
 ```erb
-<%= vue_content_tag(:span, "Hello", bind: { style: "{ color: textColor }" }) %>
-<%= vue_content_tag(:span, "Hello", "v-bind:style" => "{ color: textColor }" }) %>
+<%= tag :div, v: { data: { value: 3 }, 'on:click': 'doThis', model: form.vue_model(:name) } %>
 ```
-
-Note that you should use the latter style if you want to specify *modifiers*
-to the `v-bind` directives. For example:
-
-```erb
-<%= vue_content_tag(:span, "Hello", "v-bind:text-content.prop" => "message" }) %>
-```
-
-### The `:on` option
-
-If the *HTML options* have a `:on` key and its value is a hash,
-they get transformed into the Vue.js `v-on` directives.
-
-In the example below, these two lines have the same result:
-
-```erb
-<%= vue_content_tag(:span, "Hello", on: { click: "doThis" }) %>
-<%= vue_content_tag(:span, "Hello", "v-on:click" => "doThis" }) %>
-```
-
-Note that you should use the latter style if you want to specify *modifiers*
-to the `v-on` directives. For example:
-
-```erb
-<%= vue_content_tag(:span, "Hello", "v-on:click.once" => "doThis" }) %>
-<%= vue_content_tag(:button, "Hello", "v-on:click.prevent" => "doThis" }) %>
-```
-
-### Boolean attributes
-
-If the *HTML options* have a string value (not a boolean value)
-for `checked`, `disabled`, `multiple`, `readonly` or `selected` key,
-the key gets transformed by adding `v-bind:` to its head.
-
-In the example below, these two lines have the same result:
-
-```erb
-<%= vue_content_tag(:button, "Click me!", disabled: "!clickable") %>
-<%= vue_content_tag(:button, "Click me!", "v-bind:disabled" => "!clickable") %>
-```
-
-If you want to add a normal attribute without `v-bind:` prefix,
-specify `true` (boolean) to these keys:
-
-```erb
-<%= vue_content_tag(:button, "Click me!", disabled: true) %>
-```
-
-This line produces the following HTML fragment:
-
 ```html
-<button disabled="disabled">Click me!</button>
+<div v-on:click="doThis" data-value="3" v-model="user.name" />
 ```
 
-
-### Vue.js directives
-
-If the *HTML options* have one or more of the following keys
-
-> `text`, `html`, `show`, `if`, `else`, `else_if`, `for`, `model`, `pre`, `cloak`, `once`
-
-then, these keys get transformed by adding `v-` to their head.
-
-In the example below, these two lines have the same result:
-
-```erb
-<%= vue_tag(:hr, if: "itemsPresent") %>
-<%= vue_tag(:hr, "v-if" => "itemsPresent") %>
-```
-
-Note that the `:else_if` key is transformed into the `v-else-if` directive:
-
-```erb
-<%= vue_tag(:hr, else_if: "itemsPresent") %>
-<%= vue_tag(:hr, "v-else-if" => "itemsPresent") %>
-```
-
-### Extensions to the form building helpers
-
-When you build HTML forms using `vue_form_for`,
-the form building helpers, such as `text_field`, `check_box`, etc.,
-have these additional behavior.
-
-Example:
-
-```erb
-<%= vue_form_for User.new do |f| %>
-  <%= f.text_field :name, model: "userName" %>
-  <label>
-    <%= f.check_box :administrator, on: { click: "doThis" } %> Administrator
-  </label>
-  <%= f.submit "Create", disabled: "!submittable" %>
-<% end %>
-```
-
-The `vue_prefix` method of the Form Builder
--------------------------------------------
-
-When you build HTML forms using `vue_form_for`, the form builder has the
-`vue_prefix` method that returns the *prefix string* to the Vue.js property names.
-
-See the following code:
-
-```erb
-<%= vue_form_for User.new do |f| %>
-  <%= f.text_field :name %>
-  <%= f.submit "Create", disabled: "user.name === ''" %>
-<% end %>
-```
-
-The `vue_prefix` method of the form builder (`f`) returns the string `"user"`
-so that you can rewrite the third line of the example above like this:
-
-```erb
-  <%= f.submit "Create", disabled: "#{f.vue_prefix}.name === ''" %>
-```
-
-This method is convenient especially when the form has nested attributes:
-
-```erb
-<%= vue_form_for @user do |f| %>
-  <%= f.text_field :name %>
-  <%= f.fields_for :emails do |g| %>
-    <%= g.text_field :address,
-      disabled: "user.emails_attributes[#{g.index}]._destroy" %>
-    <%= g.check_box :_destroy if g.object.persisted? %>
-  <% end %>
-  <%= f.submit "Create", disabled: "#{f.vue_prefix}.name === ''" %>
-<% end %>
-```
-
-Using the `vue_prefix` method, you can rewrite the fifth line more concisely:
-
-```erb
-      disabled: g.vue_prefix + "._destroy" %>
-```
-
-Data Initialization
--------------------
-
+## Data Initialization
 As the official Vue.js document says:
 
 > `v-model` will ignore the initial `value`, `checked` or `selected` attributes
@@ -298,16 +139,11 @@ As the official Vue.js document says:
 
 Because of this, all form controls get reset after the Vue component is mounted.
 
-However, you can use
-[vue-data-scooper](https://github.com/kuroda/vue-data-scooper) plugin
-in order to keep the original state of the form.
+However, you can use [vue-data-scooper](https://github.com/kuroda/vue-data-scooper) plugin in order to keep the original state of the form. This does only work if all the attributes your plan on using map directly to form elements. Otherwise you can use the can just load your object from the `data` attribute.
 
-License
--------
+## License
+The `vue-rails-tag-helper` is distributed under the MIT license. ([MIT-LICENSE](https://github.com/sirwolfgang/vue-rails-tag-helper/blob/master/LICENSE))
 
-The `vue-rails-form-builder` is distributed under the MIT license. ([MIT-LICENSE](https://github.com/kuroda/vue-rails-form-builder/blob/master/MIT-LICENSE))
-
-Author
-------
-
+## Authors
+Zane Wolfgang Pickett
 Tsutomu Kuroda (t-kuroda@oiax.jp)
